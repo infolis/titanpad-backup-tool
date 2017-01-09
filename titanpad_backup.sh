@@ -1,11 +1,12 @@
+#!/bin/bash
 DOMAIN=
 USER=
 PASSWORD=
 USER_PASSWORD_FILE=
 PURGE_OLD_FILES=
 
-COOKIE=~/titanpad/.cookie
-LOCATION=~/titanpad/titanpad_backup_pads_$(date "+%Y-%m-%d").zip
+COOKIE="$HOME/titanpad/.cookie"
+LOCATION="$HOME/titanpad/titanpad_backup_pads_$(date '+%Y-%m-%d').zip"
 
 usage() {
      echo "Usage: $0 [-hx] -d <subdomain> {-u <user> -p <password> | -a <user-password-file>}" 1>&2;
@@ -59,7 +60,7 @@ verify_download() {
 
 # delete older files than a month
 delete_old_files() {
-    if [ "$PURGE_OLD_FILES" == 1 ];then
+    if [ "$PURGE_OLD_FILES" = 1 ];then
         find ~/titanpad/titanpad_backup_pads* -mtime +30 -exec rm {} \;
     fi
 }
@@ -89,16 +90,16 @@ while getopts ":d:u:p:a:x" o; do
 done
 shift $((OPTIND-1))
 
-if [ -z "$DOMAIN" ];then
+if [[ -z "$DOMAIN" ]];then
     usage
-elif [ -z "$USER" ] || [ -z "$PASSWORD" ];then
-    if [ -z "$USER_PASSWORD_FILE" ] || [ ! -f "$USER_PASSWORD_FILE" ] || [ ! -r "$USER_PASSWORD_FILE" ];then
+elif [[ -z "$USER" || -z "$PASSWORD" ]];then
+    if [[ -z "$USER_PASSWORD_FILE" || ! -f "$USER_PASSWORD_FILE" || ! -r "$USER_PASSWORD_FILE" ]];then
         echo "No such file: $USER_PASSWORD_FILE"
         usage
     else
-        USER=$(head -n1 < $USER_PASSWORD_FILE)
-        PASSWORD=$(sed -n 2p $USER_PASSWORD_FILE)
-        if [ -z "$USER" ] || [ -z "$PASSWORD" ];then
+        USER="$(head -n1 < $USER_PASSWORD_FILE)"
+        PASSWORD="$(sed -n 2p $USER_PASSWORD_FILE)"
+        if [[ -z "$USER" || -z "$PASSWORD" ]];then
             echo "Couldn't parse user/password file. Must contain username and password separated by single newline."
             usage
         fi
